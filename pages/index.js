@@ -318,9 +318,10 @@ const Home = () => {
 	}
 
 	const handleAddonPriceInput = (event) => {
+        if (!isNumeric(event.target.value, event.target.name)) return;
 		const index = event.target.name.split('-')[1];
 		const colData = Object.assign([], addonUnsavedData);
-		colData[index] = { ...dataCopy[index], price: Number(event.target.value) };
+		colData[index] = { ...colData[index], price: Number(event.target.value) };
 		setAddonUnsavedData(colData);
 	}
 
@@ -380,6 +381,31 @@ const Home = () => {
 		return formatter.format(calcData.reduce((acc, cur) => acc + Number(cur.profit), 0));
 	}
 
+    const generateQueryString = () => {
+        const pkgData = base64url.encode(base64url.escape(JSON.stringify(packageVwrData)));
+        const srvData = base64url.encode(base64url.escape(JSON.stringify(serviceVwrData)));
+        const adnData = base64url.encode(base64url.escape(JSON.stringify(addonVwrData)));
+        const clcData = base64url.encode(base64url.escape(JSON.stringify(calcData)));
+        const gData = base64url.encode(base64url.escape(goalData.toString()));
+        return `pkg=${pkgData}&srv=${srvData}&adn=${adnData}&clc=${clcData}&g=${gData}`;
+    }
+
+    const [errors, setErrors] = useState({});
+
+    const isNumeric = (value, name) => {
+        if (/^\d*$/gm.test(value)) {
+            const obj = errors;
+            obj[name] = false;
+            setErrors(obj);
+            return true;
+        } else {
+            const obj = errors;
+            obj[name] = true;
+            setErrors(obj);
+            return false;
+        }
+    }
+
 	if (router.query.ref !== 'dGhlZmVhcmxlc3NjbGltYg') {
 		return ( <p>Please access this page through your portal on <a href='https://thefearlessclimb.com/'>TheFearlessClimb.com</a></p> );
 	}
@@ -395,15 +421,9 @@ const Home = () => {
                         className={classes.print}
                         variant='outlined'
                         size='large'
-                        onClick={() => {
-                            const pkgData = base64url.encode(base64url.escape(JSON.stringify(packageVwrData)));
-                            const srvData = base64url.encode(base64url.escape(JSON.stringify(serviceVwrData)));
-                            const adnData = base64url.encode(base64url.escape(JSON.stringify(addonVwrData)));
-                            const clcData = base64url.encode(base64url.escape(JSON.stringify(calcData)));
-                            const gData = base64url.encode(base64url.escape(goalData.toString()));
-                            router.push(`/rendered?pkg=${pkgData}&srv=${srvData}&adn=${adnData}&clc=${clcData}&g=${gData}`);
-                        }}
+                        href={`/rendered?${generateQueryString()}`}
                         startIcon={<Print />}
+                        target='_blank'
                     >
                         <Typography>
                             Save/Print
@@ -640,7 +660,7 @@ const Home = () => {
                                                 defaultValue={value.price}
                                                 name={`price-${index}`}
                                                 fullWidth
-                                                inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+                                                error={errors[`price-${index}`] === true}
                                                 InputProps={{
                                                     startAdornment: <InputAdornment position='start'>$</InputAdornment>
                                                 }}
