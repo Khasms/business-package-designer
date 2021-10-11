@@ -204,10 +204,10 @@ const Rendered = (props) => {
                             {packageData.map((pkg, index) => (
                                 <TableRow key={`package-${index}`}>
                                     <TableCell className={classes.cell} align='left' key={`name-${pkg.name}`} width='55%'>
-										<Typography>{pkg.name}</Typography>
+										<Typography>{pkg.name || 'No Name'}</Typography>
                                     </TableCell>
                                     <TableCell className={classes.cell} align='left' key={`price-${pkg.name}`} width='40%'>
-										<Typography>${pkg.price}</Typography>
+										<Typography>${pkg.price || 0}</Typography>
                                     </TableCell>
                                 </TableRow>
                             ))}
@@ -234,7 +234,7 @@ const Rendered = (props) => {
                             {serviceData.map((pkg, index) => (
                                 <TableRow key={`package-${index}`}>
                                     <TableCell className={classes.cell} align='left' key={`name-${pkg.name}`}>
-										<Typography>{pkg.name}</Typography>
+										<Typography>{pkg.name || 'No Name'}</Typography>
                                     </TableCell>
                                 </TableRow>
                             ))}
@@ -264,13 +264,13 @@ const Rendered = (props) => {
 										<Typography>{value.type}</Typography>
                                     </TableCell>
                                     <TableCell className={classes.cell} component='th' width='25%'>
-										<Typography>{value.name}</Typography>
+										<Typography>{value.name || 'No Name'}</Typography>
                                     </TableCell>
                                     <TableCell className={classes.cell} component='th'>
-										<Typography>{value.description}</Typography>
+										<Typography>{value.description || 'No Description'}</Typography>
                                     </TableCell>
                                     <TableCell className={classes.cell} align='center' key={`price-${index}`} width='15%'>
-											<Typography>${value.price}</Typography>
+											<Typography>${value.price || 0}</Typography>
                                         </TableCell>
                                 </TableRow>
                             ))}
@@ -293,14 +293,14 @@ const Rendered = (props) => {
                                 </TableCell>
                                 {packageData.map((pkg, index) => (
                                     <TableCell className={classes.cell} align='center' key={`name-${pkg.name}`}>
-                                        <Typography name={`name-${index}`}>{pkg.name}</Typography>
+                                        <Typography name={`name-${index}`}>{pkg.name || 'No Name'}</Typography>
                                     </TableCell>
                                 ))}
                             </TableRow>
                             <TableRow>
                                 {packageData.map((pkg, index) => (
                                     <TableCell className={classes.titleCell} align='center' key={`price-${pkg.name}`}>
-                                        <Typography name={`price-${index}`}>${pkg.price}</Typography>
+                                        <Typography name={`price-${index}`}>${pkg.price || 0}</Typography>
                                     </TableCell>
                                 ))}
                             </TableRow>
@@ -309,7 +309,7 @@ const Rendered = (props) => {
                             {serviceData.map((value, index) => (
                                 <TableRow key={`row-${index}`}>
                                     <TableCell className={classes.cell} component='th' align='left' width='30%'>
-                                        <Typography name={`name-${index}`}>{value.name}</Typography>
+                                        <Typography name={`name-${index}`}>{value.name || 'No Name'}</Typography>
                                     </TableCell>
                                     {packageData.map((pkg, ind) => (
                                         <TableCell className={classes.cell} align='center' key={`package-${ind + 1}`}>
@@ -341,14 +341,14 @@ const Rendered = (props) => {
                                 </TableCell>
                                 {packageData.map((pkg, index) => (
                                     <TableCell className={classes.cell} align='center' key={`name-${pkg.name}`}>
-                                        <Typography name={`name-${index}`}>{pkg.name}</Typography>
+                                        <Typography name={`name-${index}`}>{pkg.name || 'No Name'}</Typography>
                                     </TableCell>
                                 ))}
                             </TableRow>
                             <TableRow>
                                 {packageData.map((pkg, index) => (
                                     <TableCell className={classes.titleCell} align='center' key={`price-${pkg.name}`}>
-                                        <Typography name={`price-${index}`}>${pkg.price}</Typography>
+                                        <Typography name={`price-${index}`}>${pkg.price || 0}</Typography>
                                     </TableCell>
                                 ))}
                             </TableRow>
@@ -361,7 +361,7 @@ const Rendered = (props) => {
                                         <Typography name={`type-${index}`}>{value.type}</Typography>
                                     </TableCell>
                                     <TableCell className={classes.cell} component='th' align='left' width='20%'>
-                                        <Typography name={`name-${index}`}>{value.name}</Typography>
+                                        <Typography name={`name-${index}`}>{value.name || 'No Name'}</Typography>
                                     </TableCell>
                                     {packageData.map((pkg, ind) => (
                                         <TableCell className={classes.cell} align='center' key={`package-${ind + 1}`} rowSpan={2}>
@@ -439,12 +439,12 @@ const Rendered = (props) => {
                                 <TableRow key={`packagedata-${index}`}>
                                     <TableCell width='23%'>
                                         <Typography>
-                                            {item.name}
+                                            {item.name || 'No Name'}
                                         </Typography>
                                     </TableCell>
                                     <TableCell align='center' width='11%'>
                                         <Typography>
-                                            ${item.price}
+                                            ${item.price || 0}
                                         </Typography>
                                     </TableCell>
                                     <TableCell width='11%'>

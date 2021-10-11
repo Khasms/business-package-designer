@@ -1,144 +1,137 @@
 export const defaultPackageData = [
 	{
-		name: 'Package #1',
-		price: 99.99
+		name: '',
 	},
 	{
-		name: 'Package #2',
-		price: 129.99
+		name: '',
 	},
 	{
-		name: 'Package #3',
-		price: 149.99
-	}
+		name: '',
+	},
 ];
 
 export const defaultServiceData = [
 	{
-		name: 'Service #1',
+		name: '',
 		'checked-1': true,
 		'checked-2': true,
-		'checked-3': true
+		'checked-3': true,
 	},
 	{
-		name: 'Service #2',
+		name: '',
 		'checked-1': false,
 		'checked-2': true,
-		'checked-3': true
+		'checked-3': true,
 	},
 	{
-		name: 'Service #3',
+		name: '',
 		'checked-1': false,
 		'checked-2': false,
-		'checked-3': true
-	}
+		'checked-3': true,
+	},
 ];
 
 export const defaultAddonData = [
 	{
-		name: 'Addon #1',
+		name: '',
 		type: 'Addon',
-		description: 'The first addon',
-		price: 19.99,
+		description: '',
 		'checked-1': true,
 		'checked-2': true,
-		'checked-3': true
+		'checked-3': true,
 	},
 	{
-		name: 'Upsell #1',
+		name: '',
 		type: 'Upsell',
-		description: 'The first upsell',
-		price: 49.99,
+		description: '',
 		'checked-1': false,
 		'checked-2': true,
-		'checked-3': true
+		'checked-3': true,
 	},
 	{
-		name: 'Downsell #1',
+		name: '',
 		type: 'Downsell',
-		description: 'The first downsell',
-		price: 9.99,
+		description: '',
 		'checked-1': false,
 		'checked-2': false,
-		'checked-3': true
+		'checked-3': true,
 	},
 	{
-		name: 'Bonus #1',
+		name: '',
 		type: 'Bonus',
-		description: 'The first bonus',
-		price: 0,
+		description: '',
 		'checked-1': false,
 		'checked-2': false,
-		'checked-3': false
-	}
+		'checked-3': false,
+	},
 ];
 
 export const defaultCalcData = [
 	{
-		name: 'Package #1',
-		price: 99.99,
+		name: '',
+		price: 0,
 		hours: 0,
 		checked: false,
 		cph: 0,
 		costs: 0,
-		sold: 0
+		sold: 0,
 	},
 	{
-		name: 'Package #2',
-		price: 129.99,
+		name: '',
+		price: 0,
 		hours: 0,
 		checked: false,
 		cph: 0,
 		costs: 0,
-		sold: 0
+		sold: 0,
 	},
 	{
-		name: 'Package #3',
-		price: 149.99,
+		name: '',
+		price: 0,
 		hours: 0,
 		checked: false,
 		cph: 0,
 		costs: 0,
-		sold: 0
+		sold: 0,
 	},
 	{
-		name: 'Addon #1',
+		name: '',
 		type: 'Addon',
-		price: 19.99,
+		price: 0,
 		hours: 0,
 		checked: false,
 		cph: 0,
 		costs: 0,
-		sold: 0
+		sold: 0,
 	},
 	{
-		name: 'Upsell #1',
+		name: '',
 		type: 'Upsell',
-		price: 49.99,
+		price: 0,
 		hours: 0,
 		checked: false,
 		cph: 0,
 		costs: 0,
-		sold: 0
+		sold: 0,
 	},
 	{
-		name: 'Downsell #1',
+		name: '',
 		type: 'Downsell',
-		price: 9.99,
+		price: 0,
 		hours: 0,
 		checked: false,
 		cph: 0,
 		costs: 0,
-		sold: 0
+		sold: 0,
 	},
 	{
-		name: 'Bonus #1',
+		name: '',
 		type: 'Bonus',
 		price: 0,
 		hours: 0,
 		checked: false,
 		cph: 0,
 		costs: 0,
-		sold: 0
-	}
+		sold: 0,
+	},
 ];

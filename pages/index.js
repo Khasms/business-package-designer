@@ -78,6 +78,8 @@ const Root = styled('div')({
 	[`& .${classes.print}`]: {
 		color: '#000000',
 		borderColor: '#000000',
+        borderWidth: 3,
+        fontWeight: 'bold',
 		width: 202,
 		height: 60,
 		margin: 30
@@ -180,23 +182,33 @@ const Home = () => {
 	}
 
 	const handlePackagePriceInput = (event) => {
+        const value = event.target.value.replace(/,/g, '');
+        if (!isNumeric(value, event.target.name)) return;
 		const index = event.target.name.split('-')[1];
 		const colData = Object.assign([], packageUnsavedData);
-		colData[index] = { ...colData[index], price: Number(event.target.value) };
+		colData[index] = { ...colData[index], price: Number(value) };
 		setPackageUnsavedData(colData);
+        const float = parseFloat(value);
+        if (!Number.isNaN(float)) {
+            event.target.value = parseFloat(value).toLocaleString('en-US', {
+                style: 'decimal',
+                maximumFractionDigits: 2,
+                minimumFractionDigits: 0,
+            });
+        }
 	}
 
 	const handlePackageMngrAdd = (event) => {
-		const newRow = { name: '', price: '' };
+		const newRow = { name: '' };
 		setPackageMngrData([ ...packageMngrData, newRow ]);
 		setPackageUnsavedData([ ...packageUnsavedData, newRow ]);
 	}
 
 	const handlePackageMngrRemove = (event, index) => {
-		const colData = Object.assign([], packageVwrData);
+		const colData = Object.assign([], packageUnsavedData);
 		colData.splice(index, 1);
+        setPackageUnsavedData(colData);
 		setPackageMngrData(colData);
-		setPackageUnsavedData(colData);
 	}
 
 	const handleUpdate = (event) => {
@@ -207,10 +219,10 @@ const Home = () => {
 		let packagesAdded = 0;
 		packageUnsavedData.forEach((pkg, index) => {
 			if (calcData[index].type) {
-				newData.push({ name: pkg.name, price: pkg.price, hours: 0, cph: 0, costs: 0, sold: 0 });
+				newData.push({ name: pkg.name || 'No Name', price: pkg.price || 0, hours: 0, cph: 0, costs: 0, sold: 0 });
 				packagesAdded++;
 			} else {
-				newData.push({ ...calcData[index], name: pkg.name, price: pkg.price });
+				newData.push({ ...calcData[index], name: pkg.name || 'No Name', price: pkg.price || 0 });
 			}
 		});
 
@@ -221,7 +233,7 @@ const Home = () => {
 		setAddonVwrData(addonUnsavedData);
 
 		addonUnsavedData.forEach((addon, index) => {
-			newData.push({ ...calcData[newData.length - packagesAdded], name: addon.name, type: addon.type, description: addon.description, price: addon.price });
+			newData.push({ ...calcData[newData.length - packagesAdded], name: addon.name || 'No Name', type: addon.type, description: addon.description || 'No Description', price: addon.price || 0 });
 		});
 		setCalcData(newData);
 	}
@@ -251,10 +263,10 @@ const Home = () => {
 	}
 
 	const handleServiceMngrRemove = (event, index) => {
-		const dataCopy = Object.assign([], serviceVwrData);
+		const dataCopy = Object.assign([], serviceUnsavedData);
 		dataCopy.splice(index, 1);
+        setServiceUnsavedData(dataCopy);
 		setServiceMngrData(dataCopy);
-		setServiceUnsavedData(dataCopy);
 	}
 
 	const handleServiceToggle = (event) => {
@@ -304,10 +316,10 @@ const Home = () => {
 	}
 
 	const handleAddonMngrRemove = (event, index) => {
-		const dataCopy = Object.assign([], addonVwrData);
+		const dataCopy = Object.assign([], addonUnsavedData);
 		dataCopy.splice(index, 1);
+        setAddonUnsavedData(dataCopy);
 		setAddonMngrData(dataCopy);
-		setAddonUnsavedData(dataCopy);
 	}
 
 	const handleAddonToggle = (event) => {
@@ -318,11 +330,20 @@ const Home = () => {
 	}
 
 	const handleAddonPriceInput = (event) => {
-        if (!isNumeric(event.target.value, event.target.name)) return;
+        const value = event.target.value.replace(/,/g, '');
+        if (!isNumeric(value, event.target.name)) return;
 		const index = event.target.name.split('-')[1];
 		const colData = Object.assign([], addonUnsavedData);
-		colData[index] = { ...colData[index], price: Number(event.target.value) };
+		colData[index] = { ...colData[index], price: Number(value) };
 		setAddonUnsavedData(colData);
+        const float = parseFloat(value);
+        if (!Number.isNaN(float)) {
+            event.target.value = parseFloat(value).toLocaleString('en-US', {
+                style: 'decimal',
+                maximumFractionDigits: 2,
+                minimumFractionDigits: 0,
+            });
+        }
 	}
 
 	// Calculation Events
@@ -331,6 +352,7 @@ const Home = () => {
 	const [goalData, setGoalData] = useState(0);
 
 	const handleHoursChange = (event) => {
+        if (!isNumeric(event.target.value, event.target.name)) return;
 		const splitName = event.target.name.split('-')[1];
 		const dataCopy = Object.assign([], calcData);
 		dataCopy[splitName] = { ...dataCopy[splitName], hours: event.target.value };
@@ -345,20 +367,41 @@ const Home = () => {
 	}
 
 	const handleCPHChange = (event) => {
+        const value = event.target.value.replace(/,/g, '');
+        if (!isNumeric(value, event.target.name)) return;
 		const splitName = event.target.name.split('-')[1];
 		const dataCopy = Object.assign([], calcData);
-		dataCopy[splitName] = { ...dataCopy[splitName], cph: event.target.value };
+		dataCopy[splitName] = { ...dataCopy[splitName], cph: value };
 		setCalcData(dataCopy);
+        const float = parseFloat(value);
+        if (!Number.isNaN(float)) {
+            event.target.value = parseFloat(value).toLocaleString('en-US', {
+                style: 'decimal',
+                maximumFractionDigits: 2,
+                minimumFractionDigits: 0,
+            });
+        }
 	}
 
 	const handleCostsChange = (event) => {
+        const value = event.target.value.replace(/,/g, '');
+        if (!isNumeric(value, event.target.name)) return;
 		const splitName = event.target.name.split('-')[1];
 		const dataCopy = Object.assign([], calcData);
-		dataCopy[splitName] = { ...dataCopy[splitName], costs: event.target.value };
+		dataCopy[splitName] = { ...dataCopy[splitName], costs: value };
 		setCalcData(dataCopy);
+        const float = parseFloat(value);
+        if (!Number.isNaN(float)) {
+            event.target.value = parseFloat(value).toLocaleString('en-US', {
+                style: 'decimal',
+                maximumFractionDigits: 2,
+                minimumFractionDigits: 0,
+            });
+        }
 	}
 
 	const handleSoldChange = (event) => {
+        if (!isNumeric(event.target.value, event.target.name)) return;
 		const splitName = event.target.name.split('-')[1];
 		const dataCopy = Object.assign([], calcData);
 		dataCopy[splitName] = { ...dataCopy[splitName], sold: event.target.value };
@@ -455,11 +498,11 @@ const Home = () => {
                             {packageMngrData.map((pkg, index) => (
                                 <TableRow key={`package-${index}`}>
                                     <TableCell className={classes.cell} align='center' width='5%'>
-                                        <IconButton size='small'onClick={(e) => handlePackageMngrRemove(e, index)}>
+                                        <IconButton size='small' onClick={(e) => handlePackageMngrRemove(e, index)}>
                                             <Delete />
                                         </IconButton>
                                     </TableCell>
-                                    <TableCell className={classes.cell} align='left' key={`name-${pkg.name}`} width='55%'>
+                                    <TableCell className={classes.cell} align='left' key={`name-cell-${index}`} width='55%'>
                                         <TextField
                                             variant='outlined'
                                             size='large'
@@ -470,14 +513,15 @@ const Home = () => {
                                             fullWidth
                                         ></TextField>
                                     </TableCell>
-                                    <TableCell className={classes.cell} align='left' key={`price-${pkg.name}`} width='40%'>
+                                    <TableCell className={classes.cell} align='left' key={`price-cell-${index}`} width='40%'>
                                         <TextField
                                             variant='outlined'
                                             size='large'
                                             label='Price'
                                             defaultValue={pkg.price}
                                             name={`price-${index}`}
-                                            inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+                                            error={errors[`price-${index}`] === true}
+                                            helperText={errors[`price-${index}`] === true ? 'Must be numeric' : ''}
                                             InputProps={{
                                                 startAdornment: <InputAdornment position='start'>$</InputAdornment>
                                             }}
@@ -542,19 +586,19 @@ const Home = () => {
                             {serviceMngrData.map((pkg, index) => (
                                 <TableRow key={`package-${index}`}>
                                     <TableCell className={classes.cell} align='center' width='5%'>
-                                        <IconButton size='small'onClick={(e) => handleServiceMngrRemove(e, index)}>
+                                        <IconButton size='small' onClick={(e) => handleServiceMngrRemove(e, index)}>
                                             <Delete />
                                         </IconButton>
                                     </TableCell>
-                                    <TableCell className={classes.cell} align='left' key={`name-${pkg.name}`}>
+                                    <TableCell className={classes.cell} align='left' key={`name-cell-${index}`}>
                                         <TextField
                                             variant='outlined'
                                             size='large'
                                             label='Description'
-                                            defaultValue={pkg.name}
                                             name={`name-${index}`}
                                             onChange={handleServiceNameInput}
                                             fullWidth
+                                            disabled={false}
                                         ></TextField>
                                     </TableCell>
                                 </TableRow>
@@ -614,7 +658,7 @@ const Home = () => {
                             {addonMngrData.map((value, index) => (
                                 <TableRow key={`package-${index}`}>
                                     <TableCell className={classes.cell} align='center' width='5%'>
-                                        <IconButton size='small'onClick={(e) => handleAddonMngrRemove(e, index)}>
+                                        <IconButton size='small' onClick={(e) => handleAddonMngrRemove(e, index)}>
                                             <Delete />
                                         </IconButton>
                                     </TableCell>
@@ -653,7 +697,7 @@ const Home = () => {
                                             onChange={handleAddonDescriptionInput}
                                         ></TextField>
                                     </TableCell>
-                                    <TableCell className={classes.cell} align='center' key={`price-${index}`} width='15%'>
+                                    <TableCell className={classes.cell} align='center' key={`price-cell-${index}`} width='15%'>
                                             <TextField
                                                 variant='outlined'
                                                 label='Price'
@@ -661,6 +705,7 @@ const Home = () => {
                                                 name={`price-${index}`}
                                                 fullWidth
                                                 error={errors[`price-${index}`] === true}
+                                                helperText={errors[`price-${index}`] === true ? 'Must be numeric' : ''}
                                                 InputProps={{
                                                     startAdornment: <InputAdornment position='start'>$</InputAdornment>
                                                 }}
@@ -719,15 +764,19 @@ const Home = () => {
                                     </Tooltip>
                                 </TableCell>
                                 {packageVwrData.map((pkg, index) => (
-                                    <TableCell className={classes.cell} align='center' key={`name-${pkg.name}`}>
-                                        <Typography name={`name-${index}`}>{pkg.name}</Typography>
+                                    <TableCell className={classes.cell} align='center' key={`name-cell-${index}`}>
+                                        <Typography name={`name-${index}`}>{pkg.name || 'No Name'}</Typography>
                                     </TableCell>
                                 ))}
                             </TableRow>
                             <TableRow>
                                 {packageVwrData.map((pkg, index) => (
-                                    <TableCell className={classes.titleCell} align='center' key={`price-${pkg.name}`}>
-                                        <Typography name={`price-${index}`}>${pkg.price}</Typography>
+                                    <TableCell className={classes.titleCell} align='center' key={`price-cell-${index}`}>
+                                        <Typography name={`price-${index}`}>${parseFloat(pkg.price || 0).toLocaleString('en-US', {
+                                            style: 'decimal',
+                                            maximumFractionDigits: 2,
+                                            minimumFractionDigits: 0,
+                                        })}</Typography>
                                     </TableCell>
                                 ))}
                             </TableRow>
@@ -736,7 +785,7 @@ const Home = () => {
                             {serviceVwrData.map((value, index) => (
                                 <TableRow key={`row-${index}`}>
                                     <TableCell className={classes.cell} component='th' align='left' width='30%'>
-                                        <Typography name={`name-${index}`}>{value.name}</Typography>
+                                        <Typography name={`name-${index}`}>{value.name || 'No Name'}</Typography>
                                     </TableCell>
                                     {packageVwrData.map((pkg, ind) => (
                                         <TableCell className={classes.cell} align='center' key={`package-${ind + 1}`}>
@@ -772,15 +821,19 @@ const Home = () => {
                                     </Tooltip>
                                 </TableCell>
                                 {packageVwrData.map((pkg, index) => (
-                                    <TableCell className={classes.cell} align='center' key={`name-${pkg.name}`}>
-                                        <Typography name={`name-${index}`}>{pkg.name}</Typography>
+                                    <TableCell className={classes.cell} align='center' key={`name-cell-${index}`}>
+                                        <Typography name={`name-${index}`}>{pkg.name || 'No Name'}</Typography>
                                     </TableCell>
                                 ))}
                             </TableRow>
                             <TableRow>
                                 {packageVwrData.map((pkg, index) => (
-                                    <TableCell className={classes.titleCell} align='center' key={`price-${pkg.name}`}>
-                                        <Typography name={`price-${index}`}>${pkg.price}</Typography>
+                                    <TableCell className={classes.titleCell} align='center' key={`price-cell-${index}`}>
+                                        <Typography name={`price-${index}`}>${parseFloat(pkg.price || 0).toLocaleString('en-US', {
+                                            style: 'decimal',
+                                            maximumFractionDigits: 2,
+                                            minimumFractionDigits: 0,
+                                        })}</Typography>
                                     </TableCell>
                                 ))}
                             </TableRow>
@@ -793,7 +846,7 @@ const Home = () => {
                                         <Typography name={`type-${index}`}>{value.type}</Typography>
                                     </TableCell>
                                     <TableCell className={classes.cell} component='th' align='left' width='20%'>
-                                        <Typography name={`name-${index}`}>{value.name}</Typography>
+                                        <Typography name={`name-${index}`}>{value.name || 'No Name'}</Typography>
                                     </TableCell>
                                     {packageVwrData.map((pkg, ind) => (
                                         <TableCell className={classes.cell} align='center' key={`package-${ind + 1}`} rowSpan={2}>
@@ -876,12 +929,12 @@ const Home = () => {
                                 <TableRow key={`packagedata-${index}`}>
                                     <TableCell width='23%'>
                                         <Typography>
-                                            {item.name}
+                                            {item.name || 'No Name'}
                                         </Typography>
                                     </TableCell>
                                     <TableCell align='center' width='11%'>
                                         <Typography>
-                                            ${item.price}
+                                            ${item.price || 0}
                                         </Typography>
                                     </TableCell>
                                     <TableCell width='11%'>
@@ -890,7 +943,8 @@ const Home = () => {
                                             size='small'
                                             label='Hours'
                                             defaultValue={0}
-                                            inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+                                            error={errors[`hours-${index}`] === true}
+                                            helperText={errors[`hours-${index}`] === true ? 'Must be numeric' : ''}
                                             name={`hours-${index}`}
                                             onChange={handleHoursChange}
                                             fullWidth
@@ -911,8 +965,9 @@ const Home = () => {
                                             size='small'
                                             label='Cost per Hour'
                                             defaultValue={0}
-                                            inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
                                             name={`cph-${index}`}
+                                            error={errors[`cph-${index}`] === true}
+                                            helperText={errors[`cph-${index}`] === true ? 'Must be numeric' : ''}
                                             InputProps={{
                                                 startAdornment: <InputAdornment position='start'>$</InputAdornment>
                                             }}
@@ -926,8 +981,9 @@ const Home = () => {
                                             size='small'
                                             label='Other Costs'
                                             defaultValue={0}
-                                            inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
                                             name={`costs-${index}`}
+                                            error={errors[`costs-${index}`] === true}
+                                            helperText={errors[`costs-${index}`] === true ? 'Must be numeric' : ''}
                                             InputProps={{
                                                 startAdornment: <InputAdornment position='start'>$</InputAdornment>
                                             }}
@@ -941,7 +997,8 @@ const Home = () => {
                                             size='small'
                                             label='Amount Sold'
                                             defaultValue={0}
-                                            inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+                                            error={errors[`sold-${index}`] === true}
+                                            helperText={errors[`sold-${index}`] === true ? 'Must be numeric' : ''}
                                             name={`sold-${index}`}
                                             onChange={handleSoldChange}
                                             fullWidth
@@ -974,12 +1031,20 @@ const Home = () => {
                                         label='Goal'
                                         defaultValue={0}
                                         name='goal'
-                                        onChange={(event) => setGoalData(Number(event.target.value))}
-                                        inputProps={{
-                                            style: { textAlign: 'right' },
-											inputMode: 'numeric',
-											pattern: '[0-9]*',
+                                        onChange={(event) => {
+                                            const value = event.target.value.replace(/,/g, '');
+                                            if (!isNumeric(value, event.target.name)) return;
+                                            setGoalData(Number(event.target.value))
+                                            const float = parseFloat(value);
+                                            if (!Number.isNaN(float)) {
+                                                event.target.value = parseFloat(value).toLocaleString('en-US', {
+                                                    style: 'decimal',
+                                                    maximumFractionDigits: 2,
+                                                    minimumFractionDigits: 0,
+                                                });
+                                            }
                                         }}
+                                        inputProps={{ style: { textAlign: 'right' } }}
                                         InputProps={{
                                             startAdornment: <InputAdornment position='start'>$</InputAdornment>
                                         }}
