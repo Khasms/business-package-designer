@@ -139,6 +139,16 @@ export async function getServerSideProps({ query }) {
     return { props: { packageData, serviceData, addonData, calcData, goal, total } };
 }
 
+const formatter = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD'
+});
+
+function format(number) {
+    return formatter.format(number.toFixed(2));
+}
+
+
 const Rendered = (props) => {
     const { packageData, serviceData, addonData, calcData, goal, total } = props;
 	const router = useRouter();
@@ -207,7 +217,7 @@ const Rendered = (props) => {
 										<Typography>{pkg.name || 'No Name'}</Typography>
                                     </TableCell>
                                     <TableCell className={classes.cell} align='left' key={`price-${pkg.name}`} width='40%'>
-										<Typography>${pkg.price || 0}</Typography>
+										<Typography>{format(pkg.price || 0)}</Typography>
                                     </TableCell>
                                 </TableRow>
                             ))}
@@ -270,7 +280,7 @@ const Rendered = (props) => {
 										<Typography>{value.description || 'No Description'}</Typography>
                                     </TableCell>
                                     <TableCell className={classes.cell} align='center' key={`price-${index}`} width='15%'>
-											<Typography>${value.price || 0}</Typography>
+											<Typography>{format(value.price || 0)}</Typography>
                                         </TableCell>
                                 </TableRow>
                             ))}
@@ -300,7 +310,7 @@ const Rendered = (props) => {
                             <TableRow>
                                 {packageData.map((pkg, index) => (
                                     <TableCell className={classes.titleCell} align='center' key={`price-${pkg.name}`}>
-                                        <Typography name={`price-${index}`}>${pkg.price || 0}</Typography>
+                                        <Typography name={`price-${index}`}>{format(pkg.price || 0)}</Typography>
                                     </TableCell>
                                 ))}
                             </TableRow>
@@ -348,7 +358,7 @@ const Rendered = (props) => {
                             <TableRow>
                                 {packageData.map((pkg, index) => (
                                     <TableCell className={classes.titleCell} align='center' key={`price-${pkg.name}`}>
-                                        <Typography name={`price-${index}`}>${pkg.price || 0}</Typography>
+                                        <Typography name={`price-${index}`}>{format(pkg.price || 0)}</Typography>
                                     </TableCell>
                                 ))}
                             </TableRow>
@@ -404,12 +414,12 @@ const Rendered = (props) => {
                                 </TableCell>
                                 <TableCell className={classes.titleCell} align='center'>
                                     <Typography>
-                                        Hours
+                                        Number Sold	
                                     </Typography>
                                 </TableCell>
                                 <TableCell className={classes.titleCell} align='center'>
                                     <Typography>
-                                        Employee*
+                                        Hours of Work
                                     </Typography>
                                 </TableCell>
                                 <TableCell className={classes.titleCell} align='center'>
@@ -419,12 +429,12 @@ const Rendered = (props) => {
                                 </TableCell>
                                 <TableCell className={classes.titleCell} align='center'>
                                     <Typography>
-                                        Other Costs
+                                        Employee*
                                     </Typography>
                                 </TableCell>
                                 <TableCell className={classes.titleCell} align='center'>
                                     <Typography>
-                                        Amount Sold	
+                                        Other Costs
                                     </Typography>
                                 </TableCell>
                                 <TableCell className={classes.titleCell} align='right'>
@@ -444,11 +454,17 @@ const Rendered = (props) => {
                                     </TableCell>
                                     <TableCell align='center' width='11%'>
                                         <Typography>
-                                            ${item.price || 0}
+                                            {format(item.price || 0)}
                                         </Typography>
+                                    </TableCell>
+                                    <TableCell align='center' width='11%'>
+										<Typography>{item.sold}</Typography>
                                     </TableCell>
                                     <TableCell width='11%'>
 										<Typography>{item.hours}</Typography>
+                                    </TableCell>
+                                    <TableCell align='center' width='11%'>
+										<Typography>{format(item.cph)}</Typography>
                                     </TableCell>
                                     <TableCell align='center' width='11%'>
 										<Typography>
@@ -460,16 +476,10 @@ const Rendered = (props) => {
 										</Typography>
                                     </TableCell>
                                     <TableCell align='center' width='11%'>
-										<Typography>${item.cph}</Typography>
-                                    </TableCell>
-                                    <TableCell align='center' width='11%'>
-										<Typography>${item.costs}</Typography>
-                                    </TableCell>
-                                    <TableCell align='center' width='11%'>
-										<Typography>{item.sold}</Typography>
+										<Typography>{format(item.costs)}</Typography>
                                     </TableCell>
                                     <TableCell align='right' width='11%'>
-                                        <Typography>${item.profit}</Typography>
+                                        <Typography>{format(item.profit)}</Typography>
                                     </TableCell>
                                 </TableRow>
                             ))}
@@ -478,7 +488,7 @@ const Rendered = (props) => {
                                     align='right'
                                     colSpan={8}
                                 >
-                                    <Typography>Total Estimated Gross Profit = ${total}</Typography>
+                                    <Typography>Total Estimated Gross Profit = {format(total)}</Typography>
                                 </TableCell>
                             </TableRow>
                             <TableRow>
@@ -489,7 +499,7 @@ const Rendered = (props) => {
                                     align='right'
                                     colSpan={2}
                                 >
-									<Typography>${goal}</Typography>
+									<Typography>Goal = {format(goal)}</Typography>
                                 </TableCell>
                             </TableRow>
                         </TableBody>

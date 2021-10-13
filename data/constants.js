@@ -42,7 +42,7 @@ export const defaultAddonData = [
 	},
 	{
 		name: '',
-		type: 'Upsell',
+		type: 'Bonus',
 		description: '',
 		'checked-1': false,
 		'checked-2': true,
@@ -58,7 +58,7 @@ export const defaultAddonData = [
 	},
 	{
 		name: '',
-		type: 'Bonus',
+		type: 'Upsell',
 		description: '',
 		'checked-1': false,
 		'checked-2': false,

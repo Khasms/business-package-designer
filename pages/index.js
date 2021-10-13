@@ -24,6 +24,7 @@ import {
 	Tooltip,
 	Stack,
 	Link,
+    tooltipClasses,
 } from '@mui/material';
 import {
 	CheckCircle,
@@ -62,6 +63,7 @@ const classes = {
     helpIcon: `${PREFIX}-helpIcon`,
     footerBar: `${PREFIX}-footerBar`,
 	stack: `${PREFIX}-stack`,
+    tooltip: `${PREFIX}-tooltip`,
 };
 
 const Root = styled('div')({
@@ -162,6 +164,19 @@ const Root = styled('div')({
 	[`& .${classes.stack}`]: {
 		'padding': '45px 0'
 	},
+    [`& .${classes.tooltip}`]: {
+		fontSize: 20,
+	},
+});
+
+const WideTooltip = styled(({ className, ...props }) => (
+    <Tooltip {...props} classes={{ popper: className }} />
+))({
+    [`& .${tooltipClasses.tooltip}`]: {
+        maxWidth: 400,
+        backgroundColor: '#4B8FCE',
+        color: '#000000',
+    },
 });
 
 const Home = () => {
@@ -186,22 +201,50 @@ const Home = () => {
         if (!isNumeric(value, event.target.name)) return;
 		const index = event.target.name.split('-')[1];
 		const colData = Object.assign([], packageUnsavedData);
-		colData[index] = { ...colData[index], price: Number(value) };
-		setPackageUnsavedData(colData);
         const float = parseFloat(value);
+		colData[index] = { ...colData[index], price: float };
+		setPackageUnsavedData(colData);
         if (!Number.isNaN(float)) {
+            const floatVal = value.split('').pop() === '.' ? '.' : '';
             event.target.value = parseFloat(value).toLocaleString('en-US', {
                 style: 'decimal',
                 maximumFractionDigits: 2,
                 minimumFractionDigits: 0,
-            });
+            }) + floatVal;
         }
 	}
 
 	const handlePackageMngrAdd = (event) => {
 		const newRow = { name: '' };
-		setPackageMngrData([ ...packageMngrData, newRow ]);
+
+        const [name, ...packages] = Object.keys(serviceUnsavedData[0]);
+        const serviceData = Object.assign([], serviceUnsavedData);
+        for (const service of serviceData) {
+            service[`checked-${packages.length + 1}`] = false;
+        }
+        setServiceUnsavedData(serviceData);
+
+        const [name2, type, description, ...packages2] = Object.keys(addonUnsavedData[0]);
+        const addonData = Object.assign([], addonUnsavedData);
+        for (const addon of addonData) {
+            addon[`checked-${packages2.length + 1}`] = false;
+        }
+        setAddonUnsavedData(addonData);
+
+        const calcDataCopy = Object.assign([], calcData);
+        calcDataCopy.push({
+            name: '',
+            price: 0,
+            hours: 0,
+            checked: false,
+            cph: 0,
+            costs: 0,
+            sold: 0,
+        });
+        setCalcData(calcDataCopy);
+
 		setPackageUnsavedData([ ...packageUnsavedData, newRow ]);
+        setPackageMngrData([ ...packageUnsavedData, newRow ]);
 	}
 
 	const handlePackageMngrRemove = (event, index) => {
@@ -215,26 +258,27 @@ const Home = () => {
 		// Packages
 		setPackageVwrData(packageUnsavedData);
 
+        // Services
+		setServiceVwrData(serviceUnsavedData);
+
+		// Addons
+		setAddonVwrData(addonUnsavedData);
+
 		const newData = [];
 		let packagesAdded = 0;
 		packageUnsavedData.forEach((pkg, index) => {
 			if (calcData[index].type) {
-				newData.push({ name: pkg.name || 'No Name', price: pkg.price || 0, hours: 0, cph: 0, costs: 0, sold: 0 });
+				newData.push({ name: pkg.name || 'No Name', price: pkg.price || 0, hours: 0, cph: 0, costs: 0, sold: 0, checked: false });
 				packagesAdded++;
 			} else {
 				newData.push({ ...calcData[index], name: pkg.name || 'No Name', price: pkg.price || 0 });
 			}
 		});
 
-		// Services
-		setServiceVwrData(serviceUnsavedData);
-
-		// Addons
-		setAddonVwrData(addonUnsavedData);
-
 		addonUnsavedData.forEach((addon, index) => {
 			newData.push({ ...calcData[newData.length - packagesAdded], name: addon.name || 'No Name', type: addon.type, description: addon.description || 'No Description', price: addon.price || 0 });
 		});
+
 		setCalcData(newData);
 	}
 
@@ -253,13 +297,13 @@ const Home = () => {
 
 	const handleServiceMngrAdd = (event) => {
 		const newRowData = { name: '' };
-		const [name, ...packages] = Object.keys(serviceMngrData[0]);
+		const [name, ...packages] = Object.keys(serviceUnsavedData[0]);
 		for (let i = 0; i < packages.length; i++) {
 			newRowData[packages[i]] = false;
 		}
 
-		setServiceMngrData([ ...serviceMngrData, newRowData ]);
-		setServiceUnsavedData([ ...serviceMngrData, newRowData ]);
+		setServiceMngrData([ ...serviceUnsavedData, newRowData ]);
+		setServiceUnsavedData([ ...serviceUnsavedData, newRowData ]);
 	}
 
 	const handleServiceMngrRemove = (event, index) => {
@@ -273,6 +317,7 @@ const Home = () => {
 		const splitName = event.target.name.split('-');
 		const dataCopy = Object.assign([], serviceVwrData);
 		dataCopy[splitName[1]] = { ...dataCopy[splitName[1]], [`checked-${splitName[2]}`]: event.target.checked };
+        setServiceUnsavedData(dataCopy);
 		setServiceVwrData(dataCopy);
 	}
 
@@ -304,15 +349,15 @@ const Home = () => {
 	}
 
 	const handleAddonMngrAdd = (event) => {
-		const [name, type, description, price, ...packages] = Object.keys(addonMngrData[0]);
-		const newRowData = { name: '', type: 'Addon', description: '', price: 0 };
+		const [name, type, description, price, ...packages] = Object.keys(addonUnsavedData[0]);
+		const newRowData = { name: '', type: 'Addon', description: '', price: '' };
 
 		for (let i = 0; i < packages.length; i++) {
 			newRowData[packages[i]] = false;
 		}
 
-		setAddonMngrData([ ...addonMngrData, newRowData ]);
-		setAddonUnsavedData([ ...addonMngrData, newRowData ]);
+		setAddonMngrData([ ...addonUnsavedData, newRowData ]);
+		setAddonUnsavedData([ ...addonUnsavedData, newRowData ]);
 	}
 
 	const handleAddonMngrRemove = (event, index) => {
@@ -326,6 +371,7 @@ const Home = () => {
 		const splitName = event.target.name.split('-');
 		const dataCopy = Object.assign([], addonVwrData);
 		dataCopy[splitName[1]] = { ...dataCopy[splitName[1]], [`checked-${splitName[2]}`]: event.target.checked };
+        setAddonUnsavedData(dataCopy);
 		setAddonVwrData(dataCopy);
 	}
 
@@ -334,15 +380,16 @@ const Home = () => {
         if (!isNumeric(value, event.target.name)) return;
 		const index = event.target.name.split('-')[1];
 		const colData = Object.assign([], addonUnsavedData);
-		colData[index] = { ...colData[index], price: Number(value) };
-		setAddonUnsavedData(colData);
         const float = parseFloat(value);
+		colData[index] = { ...colData[index], price: float };
+		setAddonUnsavedData(colData);
         if (!Number.isNaN(float)) {
-            event.target.value = parseFloat(value).toLocaleString('en-US', {
+            const floatVal = value.split('').pop() === '.' ? '.' : '';
+            event.target.value = float.toLocaleString('en-US', {
                 style: 'decimal',
                 maximumFractionDigits: 2,
                 minimumFractionDigits: 0,
-            });
+            }) + floatVal;
         }
 	}
 
@@ -355,7 +402,7 @@ const Home = () => {
         if (!isNumeric(event.target.value, event.target.name)) return;
 		const splitName = event.target.name.split('-')[1];
 		const dataCopy = Object.assign([], calcData);
-		dataCopy[splitName] = { ...dataCopy[splitName], hours: event.target.value };
+		dataCopy[splitName] = { ...dataCopy[splitName], hours: event.target.value ?? 0 };
 		setCalcData(dataCopy);
 	}
 
@@ -371,15 +418,16 @@ const Home = () => {
         if (!isNumeric(value, event.target.name)) return;
 		const splitName = event.target.name.split('-')[1];
 		const dataCopy = Object.assign([], calcData);
-		dataCopy[splitName] = { ...dataCopy[splitName], cph: value };
+        let float = parseFloat(value);
+		dataCopy[splitName] = { ...dataCopy[splitName], cph: Number.isNaN(float) ? 0 : float };
 		setCalcData(dataCopy);
-        const float = parseFloat(value);
         if (!Number.isNaN(float)) {
-            event.target.value = parseFloat(value).toLocaleString('en-US', {
+            const floatVal = value.split('').pop() === '.' ? '.' : '';
+            event.target.value = float.toLocaleString('en-US', {
                 style: 'decimal',
                 maximumFractionDigits: 2,
                 minimumFractionDigits: 0,
-            });
+            }) + floatVal;
         }
 	}
 
@@ -388,15 +436,16 @@ const Home = () => {
         if (!isNumeric(value, event.target.name)) return;
 		const splitName = event.target.name.split('-')[1];
 		const dataCopy = Object.assign([], calcData);
-		dataCopy[splitName] = { ...dataCopy[splitName], costs: value };
-		setCalcData(dataCopy);
         const float = parseFloat(value);
+		dataCopy[splitName] = { ...dataCopy[splitName], costs: Number.isNaN(float) ? 0 : float };
+		setCalcData(dataCopy);
         if (!Number.isNaN(float)) {
-            event.target.value = parseFloat(value).toLocaleString('en-US', {
+            const floatVal = value.split('').pop() === '.' ? '.' : '';
+            event.target.value = float.toLocaleString('en-US', {
                 style: 'decimal',
                 maximumFractionDigits: 2,
                 minimumFractionDigits: 0,
-            });
+            }) + floatVal;
         }
 	}
 
@@ -404,7 +453,7 @@ const Home = () => {
         if (!isNumeric(event.target.value, event.target.name)) return;
 		const splitName = event.target.name.split('-')[1];
 		const dataCopy = Object.assign([], calcData);
-		dataCopy[splitName] = { ...dataCopy[splitName], sold: event.target.value };
+		dataCopy[splitName] = { ...dataCopy[splitName], sold: event.target.value ?? 0 };
 		setCalcData(dataCopy);
 	}
 
@@ -415,9 +464,10 @@ const Home = () => {
 
 	const calculateProfit = (index) => {
 		const { price, hours, checked, cph, costs, sold } = calcData[index];
-		const profit = (price - (hours * (checked ? cph * 1.25 : cph)) - costs) * sold;
+		let profit = (price - (hours * (checked ? cph * 1.25 : cph)) - costs) * sold;
+        if (Number.isNaN(profit)) profit = 0;
 		calcData[index] = { ...calcData[index], profit };
-		return formatter.format(profit);
+		return formatter.format(profit.toFixed(2));
 	}
 
 	const calculateTotal = () => {
@@ -436,7 +486,7 @@ const Home = () => {
     const [errors, setErrors] = useState({});
 
     const isNumeric = (value, name) => {
-        if (/^\d*$/gm.test(value)) {
+        if (/^\d*\.?\d*$/gm.test(value)) {
             const obj = errors;
             obj[name] = false;
             setErrors(obj);
@@ -483,14 +533,14 @@ const Home = () => {
                         <TableHead>
                             <TableRow>
                                 <TableCell className={classes.titleCell} align='center' colSpan={3}>
-                                    <Tooltip placement='bottom' title='Test'>
+                                    <WideTooltip placement='bottom' title={<h2 className={classes.tooltip}>Enter the name and price of each package you sell.</h2>}>
                                         <Typography
                                             className={classes.titles}
                                             variant='h5'
                                         >
                                             Package Manager <HelpOutline className={classes.helpIcon} size='large' />
                                         </Typography>
-                                    </Tooltip>
+                                    </WideTooltip>
                                 </TableCell>
                             </TableRow>
                         </TableHead>
@@ -498,9 +548,12 @@ const Home = () => {
                             {packageMngrData.map((pkg, index) => (
                                 <TableRow key={`package-${index}`}>
                                     <TableCell className={classes.cell} align='center' width='5%'>
-                                        <IconButton size='small' onClick={(e) => handlePackageMngrRemove(e, index)}>
-                                            <Delete />
-                                        </IconButton>
+                                        {index === packageMngrData.length - 1 ? 
+                                            <IconButton size='small' onClick={(e) => handlePackageMngrRemove(e, index)}>
+                                                <Delete />
+                                            </IconButton>
+                                            : <></>
+                                        }
                                     </TableCell>
                                     <TableCell className={classes.cell} align='left' key={`name-cell-${index}`} width='55%'>
                                         <TextField
@@ -571,14 +624,14 @@ const Home = () => {
                         <TableHead>
                             <TableRow>
                                 <TableCell className={classes.titleCell} align='center' colSpan={2}>
-                                    <Tooltip placement='top' title='Test'>
+                                    <WideTooltip placement='top' title={<h2 className={classes.tooltip}>Enter the description of each basic service that is included in your packages.</h2>}>
                                         <Typography
                                             className={classes.titles}
                                             variant='h5'
                                         >
                                             Service Manager <HelpOutline className={classes.helpIcon} size='large' />
                                         </Typography>
-                                    </Tooltip>
+                                    </WideTooltip>
                                 </TableCell>
                             </TableRow>
                         </TableHead>
@@ -586,9 +639,13 @@ const Home = () => {
                             {serviceMngrData.map((pkg, index) => (
                                 <TableRow key={`package-${index}`}>
                                     <TableCell className={classes.cell} align='center' width='5%'>
-                                        <IconButton size='small' onClick={(e) => handleServiceMngrRemove(e, index)}>
-                                            <Delete />
-                                        </IconButton>
+                                        {index === serviceMngrData.length - 1 ?
+                                            <IconButton size='small' onClick={(e) => handleServiceMngrRemove(e, index)}>
+                                                <Delete />
+                                            </IconButton>
+                                            : <></>
+                                        }
+                                        
                                     </TableCell>
                                     <TableCell className={classes.cell} align='left' key={`name-cell-${index}`}>
                                         <TextField
@@ -643,14 +700,14 @@ const Home = () => {
                         <TableHead>
                             <TableRow>
                                 <TableCell className={classes.titleCell} align='center' colSpan={5}>
-                                    <Tooltip placement='top' title='Test'>
+                                    <WideTooltip placement='top' title={<h2 className={classes.tooltip}>Enter the name, description, and price of each service or product you offer in addition to your basic packages. Add-ons are another offer of a related product or service when they say &#39;yes&#39; to your original offer. Bonuses are the best standalone items that are included in, and complement, the base offer. Downsells are cheaper alternatives when they say &#39;no&#39; to your original offer. Upsells are upgrades that increase both the value and price of the original offer.</h2>}>
                                         <Typography
                                             className={classes.titles}
                                             variant='h5'
                                         >
                                             Additional Offers Manager <HelpOutline className={classes.helpIcon} size='large' />
                                         </Typography>
-                                    </Tooltip>
+                                    </WideTooltip>
                                 </TableCell>
                             </TableRow>
                         </TableHead>
@@ -658,9 +715,13 @@ const Home = () => {
                             {addonMngrData.map((value, index) => (
                                 <TableRow key={`package-${index}`}>
                                     <TableCell className={classes.cell} align='center' width='5%'>
-                                        <IconButton size='small' onClick={(e) => handleAddonMngrRemove(e, index)}>
-                                            <Delete />
-                                        </IconButton>
+                                        {index === addonMngrData.length - 1 ?
+                                            <IconButton size='small' onClick={(e) => handleAddonMngrRemove(e, index)}>
+                                                <Delete />
+                                            </IconButton>
+                                            : <></>
+                                        }
+                                        
                                     </TableCell>
                                     <TableCell className={classes.cell} component='th' width='10%'>
                                         <Select
@@ -754,14 +815,14 @@ const Home = () => {
                         <TableHead>
                             <TableRow>
                                 <TableCell className={classes.titleCell} align='left' rowSpan={2} width='30%'>
-                                    <Tooltip placement='top-start' title='Test'>
+                                    <WideTooltip placement='top-start' title={<h2 className={classes.tooltip}>Click on the circles. A checkmark includes that service in a package.</h2>}>
                                         <Typography
                                             className={classes.tableTitles}
                                             variant='h5'
                                         >
                                             Services <HelpOutline className={classes.helpIcon} size='large' />
                                         </Typography>
-                                    </Tooltip>
+                                    </WideTooltip>
                                 </TableCell>
                                 {packageVwrData.map((pkg, index) => (
                                     <TableCell className={classes.cell} align='center' key={`name-cell-${index}`}>
@@ -811,14 +872,14 @@ const Home = () => {
                         <TableHead>
                         <TableRow>
                                 <TableCell className={classes.titleCell} align='left' rowSpan={2} colSpan={2} width='30%'>
-                                    <Tooltip placement='top-start' title='Test'>
+                                    <WideTooltip placement='top-start' title={<h2 className={classes.tooltip}>Click on the circles. A checkmark includes that additional offer in a package.</h2>}>
                                         <Typography
                                             className={classes.tableTitles}
                                             variant='h5'
                                         >
                                             Additional Offers <HelpOutline className={classes.helpIcon} size='large' />
                                         </Typography>
-                                    </Tooltip>
+                                    </WideTooltip>
                                 </TableCell>
                                 {packageVwrData.map((pkg, index) => (
                                     <TableCell className={classes.cell} align='center' key={`name-cell-${index}`}>
@@ -878,14 +939,22 @@ const Home = () => {
                         <TableHead>
                             <TableRow>
                                 <TableCell className={classes.titleCell} align='left' width='15%'>
-                                    <Tooltip placement='top-start' title='Test'>
+                                    <WideTooltip placement='top-start' title={<h2 className={classes.tooltip}>
+                                        I recommend you do these calculations for one month of sales.
+                                        Enter the number of packages and additional offers you think you will sell. 
+                                        Enter the number of hours of work it takes to provide a package or additional offer, if you use an employee or independent contractor. 
+                                        Then enter the cost per hour of the employee or independent contractor. 
+                                        The calculation will automatically add 25% to the labor cost if you click on the circle to indicate it&#39;s being done by an employee. 
+                                        Also enter any other costs you incur to fulfill the package or additional offer. 
+                                        And finally, enter your goal to compare to your gross profit. 
+                                        </h2>}>
                                         <Typography
                                             className={classes.tableTitles}
                                             variant='h5'
                                         >
                                             Calculations <HelpOutline className={classes.helpIcon} size='large' />
                                         </Typography>
-                                    </Tooltip>
+                                    </WideTooltip>
                                 </TableCell>
                                 <TableCell className={classes.titleCell} align='center'>
                                     <Typography>
@@ -894,12 +963,12 @@ const Home = () => {
                                 </TableCell>
                                 <TableCell className={classes.titleCell} align='center'>
                                     <Typography>
-                                        Hours
+                                        Number Sold	
                                     </Typography>
                                 </TableCell>
                                 <TableCell className={classes.titleCell} align='center'>
                                     <Typography>
-                                        Employee*
+                                        Hours of Work
                                     </Typography>
                                 </TableCell>
                                 <TableCell className={classes.titleCell} align='center'>
@@ -909,12 +978,12 @@ const Home = () => {
                                 </TableCell>
                                 <TableCell className={classes.titleCell} align='center'>
                                     <Typography>
-                                        Other Costs
+                                        Employee?*
                                     </Typography>
                                 </TableCell>
                                 <TableCell className={classes.titleCell} align='center'>
                                     <Typography>
-                                        Amount Sold	
+                                        Other Costs
                                     </Typography>
                                 </TableCell>
                                 <TableCell className={classes.titleCell} align='right'>
@@ -941,7 +1010,20 @@ const Home = () => {
                                         <TextField
                                             variant='outlined'
                                             size='small'
-                                            label='Hours'
+                                            label='Number Sold'
+                                            defaultValue={0}
+                                            error={errors[`sold-${index}`] === true}
+                                            helperText={errors[`sold-${index}`] === true ? 'Must be numeric' : ''}
+                                            name={`sold-${index}`}
+                                            onChange={handleSoldChange}
+                                            fullWidth
+                                        />
+                                    </TableCell>
+                                    <TableCell width='11%'>
+                                        <TextField
+                                            variant='outlined'
+                                            size='small'
+                                            label='Hours of Work'
                                             defaultValue={0}
                                             error={errors[`hours-${index}`] === true}
                                             helperText={errors[`hours-${index}`] === true ? 'Must be numeric' : ''}
@@ -949,15 +1031,6 @@ const Home = () => {
                                             onChange={handleHoursChange}
                                             fullWidth
                                         />
-                                    </TableCell>
-                                    <TableCell align='center' width='11%'>
-                                        <Checkbox
-                                            icon={<Cancel style={{ color: '#808080' }} />}
-                                            checkedIcon={<CheckCircle style={{ color: '#4B8FCE' }} />}
-                                            checked={item.checked}
-                                            onChange={handleCPHToggle}
-                                            name={`checked-${index}`}>
-                                        </Checkbox>
                                     </TableCell>
                                     <TableCell width='11%'>
                                         <TextField
@@ -975,6 +1048,15 @@ const Home = () => {
                                             fullWidth
                                         />
                                     </TableCell>
+                                    <TableCell align='center' width='11%'>
+                                        <Checkbox
+                                            icon={<Cancel style={{ color: '#808080' }} />}
+                                            checkedIcon={<CheckCircle style={{ color: '#4B8FCE' }} />}
+                                            checked={item.checked}
+                                            onChange={handleCPHToggle}
+                                            name={`checked-${index}`}>
+                                        </Checkbox>
+                                    </TableCell>
                                     <TableCell width='11%'>
                                         <TextField
                                             variant='outlined'
@@ -988,19 +1070,6 @@ const Home = () => {
                                                 startAdornment: <InputAdornment position='start'>$</InputAdornment>
                                             }}
                                             onChange={handleCostsChange}
-                                            fullWidth
-                                        />
-                                    </TableCell>
-                                    <TableCell width='11%'>
-                                        <TextField
-                                            variant='outlined'
-                                            size='small'
-                                            label='Amount Sold'
-                                            defaultValue={0}
-                                            error={errors[`sold-${index}`] === true}
-                                            helperText={errors[`sold-${index}`] === true ? 'Must be numeric' : ''}
-                                            name={`sold-${index}`}
-                                            onChange={handleSoldChange}
                                             fullWidth
                                         />
                                     </TableCell>
@@ -1034,14 +1103,15 @@ const Home = () => {
                                         onChange={(event) => {
                                             const value = event.target.value.replace(/,/g, '');
                                             if (!isNumeric(value, event.target.name)) return;
-                                            setGoalData(Number(event.target.value))
                                             const float = parseFloat(value);
+                                            setGoalData(float);
                                             if (!Number.isNaN(float)) {
-                                                event.target.value = parseFloat(value).toLocaleString('en-US', {
+                                                const floatVal = value.split('').pop() === '.' ? '.' : '';
+                                                event.target.value = float.toLocaleString('en-US', {
                                                     style: 'decimal',
                                                     maximumFractionDigits: 2,
                                                     minimumFractionDigits: 0,
-                                                });
+                                                }) + floatVal;
                                             }
                                         }}
                                         inputProps={{ style: { textAlign: 'right' } }}
