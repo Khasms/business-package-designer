@@ -1,0 +1,15 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-fearlessclimb-dev-194413-authRole",
+      "UnauthRoleArn": "arn:aws:iam::476007539860:role/amplify-fearlessclimb-dev-194413-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::476007539860:role/amplify-fearlessclimb-dev-194413-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-fearlessclimb-dev-194413-deployment",
+      "UnauthRoleName": "amplify-fearlessclimb-dev-194413-unauthRole",
+      "StackName": "amplify-fearlessclimb-dev-194413",
+      "StackId": "arn:aws:cloudformation:us-east-1:476007539860:stack/amplify-fearlessclimb-dev-194413/9d75c040-314f-11ec-8990-0e40bd8a36fb",
+      "AmplifyAppId": "dcevnj61jjpts"
+    }
+  }
+}
