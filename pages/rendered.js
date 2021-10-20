@@ -129,13 +129,7 @@ const Root = styled('div')({
 });
 
 export async function getServerSideProps({ query }) {
-    const { pkg, srv, adn, clc, g } = query;
-	const packageData = JSON.parse(base64url.decode(pkg));
-	const serviceData = JSON.parse(base64url.decode(srv));
-	const addonData = JSON.parse(base64url.decode(adn));
-	const calcData = JSON.parse(base64url.decode(clc));
-	const goal = Number(base64url.decode(g));
-	const total = calcData.reduce((acc, cur) => acc + Number(cur.profit), 0);
+    
     return { props: { packageData, serviceData, addonData, calcData, goal, total } };
 }
 
@@ -150,8 +144,15 @@ function format(number) {
 
 
 const Rendered = (props) => {
-    const { packageData, serviceData, addonData, calcData, goal, total } = props;
 	const router = useRouter();
+    const { pkg, srv, adn, clc, g } = router.query;
+	const packageData = JSON.parse(base64url.decode(pkg));
+	const serviceData = JSON.parse(base64url.decode(srv));
+	const addonData = JSON.parse(base64url.decode(adn));
+	const calcData = JSON.parse(base64url.decode(clc));
+	const goal = Number(base64url.decode(g));
+	const total = calcData.reduce((acc, cur) => acc + Number(cur.profit), 0);
+
 	const componentRef = useRef();
     const handlePrint = useReactToPrint({
         content: () => componentRef.current,
@@ -160,8 +161,6 @@ const Rendered = (props) => {
         onBeforeGetContent: () => document.getElementById('print-button').style.display = 'none',
         onAfterPrint: () => document.getElementById('print-button').style.display = 'block',
     });
-
-	
 
 	useEffect(() => {
 		document.getElementById('print-button').click();
