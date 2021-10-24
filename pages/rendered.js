@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { styled } from '@mui/material/styles';
 import { useRouter } from 'next/router';
+import Head from 'next/head';
 import {
 	Container,
 	TableContainer,
@@ -172,6 +173,7 @@ const Rendered = (props) => {
 
 	return (
 		<Root ref={componentRef}>
+            <Head><title>The Fearless Climb Business Package Designer</title></Head>
             <Fab
                 className={classes.print}
                 variant='extended'

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { styled } from '@mui/material/styles';
 import { useRouter } from 'next/router';
+import Head from 'next/head';
 import Image from 'next/image';
 import {
 	Container,
@@ -505,6 +506,7 @@ const Home = () => {
 
 	return (
 		<Root>
+            <Head><title>The Fearless Climb Business Package Designer</title></Head>
 			{/* Header */}
             <AppBar className={classes.titleBar} fullWidth elevation={0}>
                 <Toolbar className={classes.toolBar}>
