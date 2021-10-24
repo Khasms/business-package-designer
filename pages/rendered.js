@@ -129,6 +129,13 @@ const Root = styled('div')({
 });
 
 export async function getServerSideProps({ query }) {
+    const { pkg, srv, adn, clc, g } = query;
+	const packageData = JSON.parse(base64url.decode(pkg));
+	const serviceData = JSON.parse(base64url.decode(srv));
+	const addonData = JSON.parse(base64url.decode(adn));
+	const calcData = JSON.parse(base64url.decode(clc));
+	const goal = Number(base64url.decode(g));
+	const total = calcData.reduce((acc, cur) => acc + Number(cur.profit), 0);
     
     return { props: { packageData, serviceData, addonData, calcData, goal, total } };
 }
@@ -142,16 +149,9 @@ function format(number) {
     return formatter.format(number.toFixed(2));
 }
 
-
 const Rendered = (props) => {
 	const router = useRouter();
-    const { pkg, srv, adn, clc, g } = router.query;
-	const packageData = JSON.parse(base64url.decode(pkg));
-	const serviceData = JSON.parse(base64url.decode(srv));
-	const addonData = JSON.parse(base64url.decode(adn));
-	const calcData = JSON.parse(base64url.decode(clc));
-	const goal = Number(base64url.decode(g));
-	const total = calcData.reduce((acc, cur) => acc + Number(cur.profit), 0);
+    const { packageData, serviceData, addonData, calcData, goal, total } = props;
 
 	const componentRef = useRef();
     const handlePrint = useReactToPrint({
@@ -463,7 +463,7 @@ const Rendered = (props) => {
 										<Typography>{item.hours}</Typography>
                                     </TableCell>
                                     <TableCell align='center' width='11%'>
-										<Typography>{format(item.cph)}</Typography>
+										<Typography>{format(item.cph || 0)}</Typography>
                                     </TableCell>
                                     <TableCell align='center' width='11%'>
 										<Typography>
@@ -475,10 +475,10 @@ const Rendered = (props) => {
 										</Typography>
                                     </TableCell>
                                     <TableCell align='center' width='11%'>
-										<Typography>{format(item.costs)}</Typography>
+										<Typography>{format(item.costs || 0)}</Typography>
                                     </TableCell>
                                     <TableCell align='right' width='11%'>
-                                        <Typography>{format(item.profit)}</Typography>
+                                        <Typography>{format(item.profit || 0)}</Typography>
                                     </TableCell>
                                 </TableRow>
                             ))}
@@ -487,7 +487,7 @@ const Rendered = (props) => {
                                     align='right'
                                     colSpan={8}
                                 >
-                                    <Typography>Total Estimated Gross Profit = {format(total)}</Typography>
+                                    <Typography>Total Estimated Gross Profit = {format(total || 0)}</Typography>
                                 </TableCell>
                             </TableRow>
                             <TableRow>
@@ -498,7 +498,7 @@ const Rendered = (props) => {
                                     align='right'
                                     colSpan={2}
                                 >
-									<Typography>Goal = {format(goal)}</Typography>
+									<Typography>Goal = {format(goal || 0)}</Typography>
                                 </TableCell>
                             </TableRow>
                         </TableBody>
