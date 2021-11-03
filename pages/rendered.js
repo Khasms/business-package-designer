@@ -182,7 +182,7 @@ const Rendered = (props) => {
                 id='print-button'
             >
                 <Print style={{ marginRight: 5 }} />
-                Save/Print
+                Print
             </Fab>
 
             {/* Header */}

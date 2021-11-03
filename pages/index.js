@@ -521,7 +521,7 @@ const Home = () => {
                         target='_blank'
                     >
                         <Typography>
-                            Save/Print
+                            Print
                         </Typography>
                     </Button>
                 </Toolbar>
